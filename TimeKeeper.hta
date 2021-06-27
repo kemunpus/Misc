@@ -1,0 +1,104 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <hta:application applicationname="Time Keeper" singleinstance="yes" showintaskbar="yes" caption="no" border="no" innerborder="no" navigable="no">
+        <title>Time Keeper</title>
+
+        <style type="text/css">
+            body {
+                background: black;
+                color: white;
+                overflow: hidden;
+                text-align: center;
+            }
+            
+            div.time {
+                font-size: 24px;
+                font-weight: bolder;
+            }
+            
+            button {
+                font-size: 8px;
+            }
+        </style>
+
+        <script type="text/javascript">
+            var lapTime = 5 * 60;
+
+            var width = 200;
+            var height = 80;
+
+            var timerId = null;
+            var elapsedTime = 0;
+
+            window.onload = function() {
+                window.moveTo((screen.availWidth - width), 4);
+                window.resizeTo(width, height);
+
+                resetTimer();
+
+                var excel = new ActiveXObject("Excel.Application");
+                var hwnd = excel.ExecuteExcel4Macro("CALL(\"user32\", \"FindWindowA\", \"JCC\", \"HTML Application Host Window Class\", \"" + document.title + "\")");
+                excel.ExecuteExcel4Macro("CALL(\"user32\", \"SetWindowPos\", \"JJJJJJJJ\", " + hwnd + ", -1, 0, 0, 0, 0, 3)");
+                excel = null;
+            }
+
+            function startTimer() {
+
+                if (!timerId) {
+                    timerId = setInterval(onInterval, 1000);
+                }
+            }
+
+            function onInterval() {
+
+                if (elapsedTime < lapTime) {
+                    elapsedTime++;
+
+                    setTimerText(lapTime - elapsedTime);
+
+                } else {
+                    stopTimer();
+                }
+            }
+
+            function stopTimer() {
+
+                if (timerId) {
+                    clearTimeout(timerId);
+                    timerId = null;
+                }
+            }
+
+            function resetTimer() {
+                elapsedTime = 0;
+
+                setTimerText(lapTime);
+
+                stopTimer();
+            }
+
+            function setTimerText(leftTime) {
+                var min = Math.floor(leftTime / 60);
+                var sec = Math.floor(leftTime - (min * 60));
+                var text = ('00' + min).slice(-2) + ':' + ('00' + sec).slice(-2);
+
+                document.getElementById("time").innerText = text;
+            }
+
+            function closeApp() {
+                window.close();
+            }
+        </script>
+</head>
+
+<body>
+    <div id="time" class="time"></div>
+    <button onclick="startTimer();">START</button>
+    <button onclick="stopTimer();">STOP</button>
+    <button onclick="resetTimer();">RESET</button>
+    <button onclick="closeApp();">CLOSE</button>
+</body>
+
+</html>
